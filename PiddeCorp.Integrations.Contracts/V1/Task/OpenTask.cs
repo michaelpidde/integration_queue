@@ -1,4 +1,5 @@
-﻿using PiddeCorp.Integrations.Contracts.V1.Task.Type;
+﻿using System.Diagnostics.CodeAnalysis;
+using PiddeCorp.Integrations.Contracts.V1.Task.Type;
 using System.Text.Json;
 
 namespace PiddeCorp.Integrations.Contracts.V1.Task;
@@ -46,6 +47,17 @@ public abstract class TaskData { }
 /// </para>
 /// </remarks>
 public sealed class OpenTask {
+    public OpenTask() { }
+    
+    [SetsRequiredMembers]
+    public OpenTask(Guid id, DateTime created, TaskType type, DateTime due, TaskData data) {
+        Id = id;
+        Created = created;
+        Type = type;
+        Due = due;
+        Data = data;
+    }
+    
     /// <summary>
     /// The name of the queue this message is published to and consumed from.
     /// </summary>

@@ -1,0 +1,6 @@
+@PiddeCorp.TaskManager.API_HostAddress = http://localhost:5014
+
+GET {{PiddeCorp.TaskManager.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

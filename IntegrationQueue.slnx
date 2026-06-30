@@ -2,5 +2,6 @@
   <Project Path="PiddeCorp.Integrations.Contracts/PiddeCorp.Integrations.Contracts.csproj" />
   <Project Path="PiddeCorp.RabbitMQ/PiddeCorp.RabbitMQ.csproj" />
   <Project Path="PiddeCorp.TaskConsumer/PiddeCorp.TaskConsumer.csproj" />
+  <Project Path="PiddeCorp.TaskManager.API/PiddeCorp.TaskManager.API.csproj" />
   <Project Path="PiddeCorp.TaskProducer/PiddeCorp.TaskProducer.csproj" />
 </Solution>
