@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Bogus;
+using RabbitMQ.Client;
 using PiddeCorp.RabbitMQ;
 using PiddeCorp.Integrations.Contracts.V1.Task;
 using PiddeCorp.Integrations.Contracts.V1.Task.Type;
@@ -6,6 +7,15 @@ using PiddeCorp.Integrations.Contracts.V1.Task.Type;
 namespace PiddeCorp.TaskProducer;
 
 public static class Producer2 {
+    private static List<string> GenerateRandomStrings(int capacity) {
+        string[] strings = new string[capacity];
+        Faker faker = new();
+        for(int i = 0; i < capacity; ++i) {
+            strings[i] = string.Join(" ", faker.Lorem.Words(capacity));
+        }
+        return strings.ToList();
+    }
+    
     private static OpenTask GenerateRandomTask() {
         Random rng = new();
         int random = rng.Next(1, 4);
@@ -15,27 +25,27 @@ public static class Producer2 {
                 Id = Guid.NewGuid(),
                 Created = DateTime.Now,
                 Type = TaskType.Todo,
-                Due = DateTime.Now.AddDays(5),
+                Due = DateTime.Now.AddDays(rng.Next(1, 32)),
                 Data = new Todo() {
                     IsOrderedByPriority = true,
-                    Items = ["Wash dishes", "Scrub toilet"],
+                    Items = GenerateRandomStrings(rng.Next(2, 6)),
                 },
             },
             2 => new OpenTask {
                 Id = Guid.NewGuid(),
                 Created = DateTime.Now,
                 Type = TaskType.HoneyDo,
-                Due = DateTime.Now.AddHours(1),
-                Data = new HoneyDo() { Description = "Clean the gutters! xoxo", },
+                Due = DateTime.Now.AddHours(rng.Next(1, 51)),
+                Data = new HoneyDo() { Description = new Faker().Company.Bs() },
             },
             _ => new OpenTask {
                 Id = Guid.NewGuid(),
                 Created = DateTime.Now,
                 Type = TaskType.MountainDew,
-                Due = DateTime.Now.AddHours(1),
+                Due = DateTime.Now.AddHours(rng.Next(1, 11)),
                 Data = new MountainDew() {
-                    ExtremeCaffeine = true,
-                    Flavor = "Voltage Raspberry",
+                    ExtremeCaffeine = Convert.ToBoolean(rng.Next(0, 2)),
+                    Flavor = new Faker().Commerce.ProductName(),
                     Comment = "Chug before doing anything else or you're fired.",
                 },
             },
