@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using PiddeCorp.Integrations.Contracts.V1.CustomType;
 using RabbitMQ.Client;
 using PiddeCorp.RabbitMQ;
 using PiddeCorp.Integrations.Contracts.V1.Task;
@@ -7,13 +8,14 @@ using PiddeCorp.Integrations.Contracts.V1.Task.Type;
 namespace PiddeCorp.TaskProducer;
 
 public static class Producer2 {
-    private static List<string> GenerateRandomStrings(int capacity) {
-        string[] strings = new string[capacity];
+    private static BoundedStringList GenerateRandomStrings(int capacity) {
+        BoundedStringList strings = [];
         Faker faker = new();
         for(int i = 0; i < capacity; ++i) {
-            strings[i] = string.Join(" ", faker.Lorem.Words(capacity));
+            strings.Add(string.Join(" ", faker.Lorem.Words(capacity)));
         }
-        return strings.ToList();
+        
+        return strings;
     }
     
     private static OpenTask GenerateRandomTask() {

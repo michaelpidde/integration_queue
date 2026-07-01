@@ -1,3 +1,44 @@
 Parallel.ForEachAsync took ~1 minute to push 100,000 messages onto the queue
 
 1 unoptimized, single threaded, single instance consumer service ingested 10,000 messages into SQL Sever in ~5 minutes, so we can estimate 2,000 transmissible messages per minute.
+
+10 consumers (with VM using --memory 12288 --cpus 8) consume around 135 acks/s (~8K/m)
+
+Concerns with bulk DB inserts:
+* Message properties MUST be validated (ideally prior to sending to queue). Primary concerns are varchar overflows.
+* Someone can hand-roll a queue message; usage of the contract library is a key component to ensuring message correctness which in turn helps ensure bulk operation success.
+* Mixed message format (subtypes for Todo, HoneyDo, MountainDew) in the same queue makes batching exponentially harder:
+    1) Deserialize
+    2) Bulk insert into OpenTask
+    3) Bulk insert into OpenTaskWorkflow
+    4) Split into groups: Todo, HoneyDo, MountainDew
+    5) a) Bulk insert into Todo, if any
+       b) Bulk insert into TodoItem, potentially per Todo item, using FK reference
+    6) Bulk insert into HoneyDo, if any
+    7) Bulk insert into MountainDew, if any
+    8) Ack
+* A single message format per queue makes batching safer:
+    1) Deserialize
+    2) Bulk insert OpenTask
+    3) Bulk insert OpenTaskWorkflow
+    4) a) Bulk insert subtype
+       b) Bulk insert TodoItem if applicable
+    5) Ack
+* Single message format per queue would be a more viable option if needing to bulk insert/merge into a destination table
+
+
+Access control should be utilized in RabbitMQ:
+* producer should have its own user with grants for configure/write/read only to the queue(s) it needs
+* consumer should have its own user with grants for configure/write/read only to the queue(s) it needs
+
+
+Runbook to figure out if "something is stuck in the queue":
+Is it in the OpenItem/OpenItemWorkflow table?
+   Y) It's not stuck
+   N) Are there items in the queue not moving?
+      Y) Consumer issue
+      N) Was it produced into the queue (check producer logs)?
+         Y) a) It's still in the queue (if queue has depth and acks are active)
+            b) It was lost from the queue due to consumer issue (misuse of ack/nack)
+            c) It was moved into a DLX
+         N) Producer issue

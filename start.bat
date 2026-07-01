@@ -1,6 +1,7 @@
 @echo off
 
-podman machine init --memory 6144 --cpus 4 --disk-size 60
+@REM podman machine init --memory 6144 --cpus 4 --disk-size 60
+podman machine init --memory 12288 --cpus 8 --disk-size 60
 podman machine start
 podman network create pidde-net
 podman run -d --name rabbitmq --network pidde-net -p 5672:5672 -p 15672:15672 --volume rabbitmq_data:/var/lib/rabbitmq rabbitmq:3-management

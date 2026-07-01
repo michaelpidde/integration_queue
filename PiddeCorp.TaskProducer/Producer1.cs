@@ -11,6 +11,7 @@ public static class Producer1 {
             await Queue.Connect("amqp://guest:guest@localhost:5672/", OpenTask.QueueName);
         Console.WriteLine("Queue connected.");
         
+
         OpenTask todoTask = new() {
             Id = Guid.NewGuid(),
             Created = DateTime.Now,
@@ -21,7 +22,6 @@ public static class Producer1 {
                 Items = ["Wash dishes", "Scrub toilet"],
             },
         };
-        
         await Queue.SendMessage(channel,
                                 System.Text.Encoding.UTF8.GetBytes(todoTask.Serialize()),
                                 OpenTask.QueueName

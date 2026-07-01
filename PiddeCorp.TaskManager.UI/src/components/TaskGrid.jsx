@@ -8,7 +8,15 @@ export function TaskGrid({ data }) {
 
     useEffect(() => {
         tabulatorRef.current = new Tabulator(tableRef.current, {
-            data: data,
+            ajaxUrl: 'http://localhost:5000/api/tasks',
+            pagination: true,
+            paginationMode: 'remote',
+            paginationSize: 50,
+            paginationInitialPage: 5,
+            dataSendParams: {
+                "page":"pageNo", //change page request parameter to "pageNo"
+            },
+            // data: data,
             layout: 'fitColumns',
             columns: [
                 { title: 'Id', field: 'id' },
